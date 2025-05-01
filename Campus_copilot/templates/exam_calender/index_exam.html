@@ -646,6 +646,10 @@
                                 <input type="checkbox" id="email-reminder" name="email-reminder">
                                 <label for="email-reminder">Email Reminder</label>
                             </div>
+                            <div class="form-group" id="email-input-group" style="display: none;">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" placeholder="Enter your email address">
+                            </div>
                             <div class="checkbox-group">
                                 <input type="checkbox" id="notification-reminder" name="notification-reminder">
                                 <label for="notification-reminder">Browser Notification</label>
@@ -834,6 +838,62 @@
         chatbotButton.addEventListener('click', () => {
             alert('Chatbot functionality will be implemented here!');
             // In a real implementation, this would open a chat interface
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailReminderCheckbox = document.getElementById('email-reminder');
+            const emailInputGroup = document.getElementById('email-input-group');
+            const notificationReminderCheckbox = document.getElementById('notification-reminder');
+
+            // Show/hide email input based on checkbox
+            emailReminderCheckbox.addEventListener('change', function() {
+                emailInputGroup.style.display = this.checked ? 'block' : 'none';
+            });
+
+            // Request permission for notifications
+            if (Notification.permission !== 'denied') {
+                Notification.requestPermission();
+            }
+
+            // Function to send browser notification
+            function sendBrowserNotification(examDetails) {
+                if (Notification.permission === 'granted') {
+                    new Notification('Exam Reminder', {
+                        body: `You have an exam for ${examDetails.subject} on ${examDetails.date} at ${examDetails.time}.`,
+                        icon: 'https://via.placeholder.com/40' // Replace with your icon URL
+                    });
+                }
+            }
+
+            // Form submission
+            document.getElementById('exam-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const examDetails = {
+                    subject: document.getElementById('subject').value,
+                    date: document.getElementById('exam-date').value,
+                    time: document.getElementById('exam-time').value,
+                };
+
+                // Handle email notification
+                if (emailReminderCheckbox.checked) {
+                    const email = document.getElementById('email').value;
+                    if (email) {
+                        // Here you would typically send the email to your server for processing
+                        alert(`Email reminder set for ${email} for the exam on ${examDetails.date} at ${examDetails.time}.`);
+                    } else {
+                        alert('Please enter a valid email address for email reminders.');
+                    }
+                }
+
+                // Handle browser notification
+                if (notificationReminderCheckbox.checked) {
+                    sendBrowserNotification(examDetails);
+                }
+
+                // Reset the form
+                this.reset();
+            });
         });
     </script>
 </body>
