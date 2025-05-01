@@ -1,900 +1,1377 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exam Calendar - Campus Copilot</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #4285F4;
-            --secondary-color: #34A853;
-            --accent-color: #FBBC05;
-            --danger-color: #EA4335;
-            --dark-color: #202124;
-            --light-color: #F8F9FA;
-            --sidebar-width: 280px;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
-        }
-        
-        body {
-            background-color: var(--light-color);
-            color: var(--dark-color);
-            overflow-x: hidden;
-        }
-        
-        .app-container {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        /* Sidebar Styles */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: white;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            height: 100vh;
-            left: -280px;
-            transition: left 0.3s ease;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .sidebar.active {
-            left: 0;
-        }
-        
-        .sidebar-header {
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        
-        .sidebar-header img {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-        
-        .sidebar-header h3 {
-            font-size: 1.5rem;
-            font-weight: 500;
-            color: var(--primary-color);
-        }
-        
-        .sidebar-menu {
-            padding: 10px 0;
-        }
-        
-        .menu-item {
-            padding: 15px 20px;
-            display: flex;
-            align-items: center;
-            color: var(--dark-color);
-            text-decoration: none;
-            transition: background-color 0.2s;
-        }
-        
-        .menu-item:hover {
-            background-color: rgba(66, 133, 244, 0.1);
-        }
-        
-        .menu-item.active {
-            background-color: rgba(66, 133, 244, 0.2);
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .menu-item i {
-            margin-right: 15px;
-            font-size: 1.2rem;
-            width: 20px;
-            text-align: center;
-            color: var(--primary-color);
-        }
-        
-        .menu-item span {
-            font-size: 1rem;
-        }
-        
-        /* Main Content Styles */
-        .main-content {
-            flex: 1;
-            margin-left: 0;
-            transition: margin-left 0.3s ease;
-            padding: 20px;
-        }
-        
-        .main-content.active {
-            margin-left: var(--sidebar-width);
-        }
-        
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            margin-bottom: 30px;
-        }
-        
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--primary-color);
-        }
-        
-        .search-bar {
-            flex: 1;
-            max-width: 500px;
-            margin: 0 20px;
-            position: relative;
-        }
-        
-        .search-bar input {
-            width: 100%;
-            padding: 10px 15px;
-            border-radius: 50px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            outline: none;
-            font-size: 1rem;
-            padding-left: 40px;
-        }
-        
-        .search-bar i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #888;
-        }
-        
-        .user-profile {
-            display: flex;
-            align-items: center;
-        }
-        
-        .user-profile img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-left: 15px;
-        }
-        
-        /* Calendar Styles */
-        .calendar-container {
-            display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .calendar-section {
-            flex: 2;
-            min-width: 300px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            padding: 25px;
-        }
-        
-        .form-section {
-            flex: 1;
-            min-width: 300px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            padding: 25px;
-        }
-        
-        .section-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: var(--primary-color);
-            display: flex;
-            align-items: center;
-        }
-        
-        .section-title i {
-            margin-right: 10px;
-        }
-        
-        /* Calendar Grid */
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .calendar-nav {
-            display: flex;
-            align-items: center;
-        }
-        
-        .calendar-nav button {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: var(--primary-color);
-            padding: 5px 10px;
-        }
-        
-        .current-month {
-            font-size: 1.2rem;
-            font-weight: 500;
-            margin: 0 15px;
-        }
-        
-        .weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            font-weight: 500;
-            margin-bottom: 10px;
-        }
-        
-        .weekdays div {
-            padding: 10px;
-        }
-        
-        .days {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            grid-gap: 5px;
-        }
-        
-        .days div {
-            padding: 10px;
-            text-align: center;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .days div:hover:not(.empty) {
-            background-color: rgba(66, 133, 244, 0.1);
-        }
-        
-        .days .today {
-            background-color: var(--primary-color);
-            color: white;
-        }
-        
-        .days .has-event {
-            position: relative;
-        }
-        
-        .days .has-event::after {
-            content: '';
-            position: absolute;
-            bottom: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background-color: var(--accent-color);
-        }
-        
-        .days .empty {
-            color: #ccc;
-            cursor: default;
-        }
-        
-        /* Form Styles */
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 10px 15px;
-            border-radius: 5px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            outline: none;
-            font-size: 1rem;
-        }
-        
-        .form-group select {
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 1em;
-        }
-        
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            margin-top: 10px;
-        }
-        
-        .checkbox-group input {
-            width: auto;
-            margin-right: 10px;
-        }
-        
-        .submit-btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            width: 100%;
-        }
-        
-        .submit-btn:hover {
-            background-color: #3367d6;
-        }
-        
-        /* Event List */
-        .event-list {
-            margin-top: 30px;
-        }
-        
-        .event-item {
-            background-color: rgba(66, 133, 244, 0.1);
-            border-left: 4px solid var(--primary-color);
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .event-details h4 {
-            margin-bottom: 5px;
-            font-size: 1.1rem;
-        }
-        
-        .event-details p {
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        .event-actions button {
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            margin-left: 10px;
-            font-size: 1rem;
-            transition: color 0.2s;
-        }
-        
-        .event-actions button:hover {
-            color: var(--primary-color);
-        }
-        
-        .event-actions .delete-btn:hover {
-            color: var(--danger-color);
-        }
-        
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal.active {
-            display: flex;
-        }
-        
-        .modal-content {
-            background-color: white;
-            border-radius: 10px;
-            padding: 25px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 500;
-        }
-        
-        .close-modal {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #666;
-        }
-        
-        /* Responsive Styles */
-        @media (max-width: 768px) {
-            .calendar-container {
-                flex-direction: column;
-            }
-            
-            .calendar-section, .form-section {
-                width: 100%;
-            }
-        }
-        
-        /* Chatbot Button */
-        .chatbot-button {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            width: 60px;
-            height: 60px;
-            background-color: var(--primary-color);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 1.5rem;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            z-index: 1000;
-            transition: all 0.3s;
-        }
-        
-        .chatbot-button:hover {
-            transform: scale(1.1);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Deadline Daze Defender</title>
+  <style>
+    /* Base Styles */
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --primary: #1e3a8a;
+  --primary-foreground: #f8fafc;
+  --secondary: #8b5cf6;
+  --secondary-foreground: #f8fafc;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f3e8ff;
+  --accent-foreground: #1e293b;
+  --destructive: #ef4444;
+  --destructive-foreground: #f8fafc;
+  --ring: #1e3a8a;
+  --radius: 0.5rem;
+  
+  --exam-blue-50: #EFF6FF;
+  --exam-blue-100: #DBEAFE;
+  --exam-blue-600: #2563EB;
+  --exam-blue-800: #1E40AF;
+  --exam-purple-100: #EDE9FE;
+  --exam-purple-500: #8B5CF6;
+  --exam-purple-800: #5B21B6;
+  --sidebar-bg: #f8f9fa;
+  --sidebar-hover: #e9ecef;
+  --sidebar-active: var(--exam-blue-600);
+  --sidebar-active-bg: rgba(37, 99, 235, 0.1);
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 0px;
+  --header-height: 70px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: var(--foreground);
+  background-color: var(--background);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* App Container */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  transition: transform 0.3s ease;
+  transform: translateX(-100%);
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, var(--exam-blue-100), var(--exam-purple-100));
+  height: var(--header-height);
+}
+
+.sidebar-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.sidebar-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--exam-blue-600);
+}
+
+.sidebar-close {
+  border: none;
+  background: transparent;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.sidebar-close:hover {
+  background-color: var(--muted);
+}
+
+.sidebar-menu {
+  padding: 1rem 0;
+}
+
+.sidebar-menu ul {
+  list-style: none;
+}
+
+.sidebar-item {
+  position: relative;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  color: var(--foreground);
+  text-decoration: none;
+  transition: background-color 0.2s;
+  font-size: 0.9rem;
+}
+
+.sidebar-link:hover {
+  background-color: var(--sidebar-hover);
+}
+
+.sidebar-item.active .sidebar-link {
+  color: var(--sidebar-active);
+  background-color: var(--sidebar-active-bg);
+  font-weight: 600;
+}
+
+.sidebar-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 4px;
+  background-color: var(--sidebar-active);
+}
+
+.sidebar-link svg {
+  width: 20px;
+  height: 20px;
+  color: var(--muted-foreground);
+  transition: color 0.2s;
+}
+
+.sidebar-item.active .sidebar-link svg {
+  color: var(--sidebar-active);
+}
+
+/* Main Wrapper */
+.main-wrapper {
+  flex: 1;
+  margin-left: 0;
+  transition: margin-left 0.3s ease;
+  width: 100%;
+}
+
+.main-wrapper.sidebar-open {
+  margin-left: var(--sidebar-width);
+}
+
+/* Menu Toggle */
+.menu-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.menu-toggle {
+  border: none;
+  background: transparent;
+  color: var(--foreground);
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  transition: background-color 0.2s;
+}
+
+.menu-toggle:hover {
+  background-color: var(--muted);
+}
+
+/* Header Styles */
+.header {
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: var(--background);
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.calendar-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--exam-blue-600);
+}
+
+.app-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.text-blue {
+  color: var(--exam-blue-600);
+}
+
+.text-purple {
+  color: var(--exam-purple-500);
+}
+
+.text-dark-blue {
+  color: var(--exam-blue-800);
+}
+
+.notification-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bell-icon {
+  color: var(--exam-purple-500);
+}
+
+.notification-text {
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: none;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  padding: 1.5rem 0;
+}
+
+/* Card Styles */
+.card {
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  background-color: var(--card);
+  background-image: linear-gradient(109.6deg, rgba(223,234,247,1) 11.2%, rgba(244,248,252,1) 91.1%);
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Form Styles */
+.exam-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+input, select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--input);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input:focus, select:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 1px var(--ring);
+}
+
+input[readonly] {
+  background-color: var(--muted);
+  cursor: not-allowed;
+}
+
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
+  border-radius: var(--radius);
+  padding: 0.5rem 1rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, hsla(221, 45%, 73%, 1) 0%, hsla(220, 78%, 29%, 1) 100%);
+  color: var(--primary-foreground);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.btn-outline {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+}
+
+.btn-outline:hover {
+  background-color: var(--muted);
+}
+
+.btn-destructive {
+  background-color: var(--destructive);
+  color: var(--destructive-foreground);
+}
+
+.btn-destructive:hover {
+  opacity: 0.9;
+}
+
+/* Tabs */
+.tabs {
+  margin-top: 1rem;
+}
+
+.tab-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.tab-button {
+  padding: 0.5rem;
+  text-align: center;
+  background-color: var(--muted);
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.tab-button.active {
+  background: linear-gradient(90deg, hsla(277, 75%, 84%, 1) 0%, hsla(297, 50%, 51%, 1) 100%);
+  color: var(--primary-foreground);
+}
+
+.tab-content {
+  display: none;
+  margin-top: 1rem;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Exam Cards */
+.exam-cards {
+  display: grid;
+  gap: 1rem;
+}
+
+.exam-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 1rem;
+  background-color: var(--card);
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.exam-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.exam-card-urgent {
+  border-color: var(--exam-purple-500);
+  background-image: linear-gradient(90deg, hsla(24, 100%, 83%, 1) 0%, hsla(341, 91%, 68%, 1) 100%);
+  color: var(--primary-foreground);
+}
+
+.exam-card-completed {
+  background-image: linear-gradient(90deg, hsla(46, 73%, 75%, 1) 0%, hsla(176, 73%, 88%, 1) 100%);
+}
+
+.card-shimmer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.exam-card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.exam-name {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.exam-name.completed {
+  text-decoration: line-through;
+  color: var(--muted-foreground);
+}
+
+.urgent-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  background-color: rgba(139, 92, 246, 0.1);
+  color: var(--exam-purple-800);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.exam-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.exam-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.exam-notification {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.exam-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.exam-actions .btn {
+  flex: 1;
+  font-size: 0.75rem;
+  padding: 0.375rem 0.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem 0;
+  color: var(--muted-foreground);
+}
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 0;
+}
+
+.footer p {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+/* Toast notifications */
+.toast-container {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toast {
+  border-radius: var(--radius);
+  padding: 1rem;
+  padding-right: 2.5rem;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  min-width: 300px;
+  max-width: 100%;
+  position: relative;
+  animation: slide-in 0.2s ease-out;
+}
+
+.toast-default {
+  background-image: linear-gradient(90deg, hsla(221, 45%, 73%, 1) 0%, hsla(220, 78%, 29%, 1) 100%);
+  color: var(--primary-foreground);
+}
+
+.toast-destructive {
+  background-image: linear-gradient(90deg, hsla(22, 100%, 78%, 1) 0%, hsla(2, 78%, 62%, 1) 100%);
+  color: var(--primary-foreground);
+}
+
+.toast-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.toast-description {
+  font-size: 0.875rem;
+}
+
+.toast-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  border: none;
+  background: transparent;
+  color: currentColor;
+  cursor: pointer;
+  opacity: 0.7;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+}
+
+.toast-close:hover {
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .content-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .notification-text {
+    display: inline;
+  }
+  
+  .exam-cards {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+  }
+  
+  .main-wrapper.sidebar-open {
+    margin-left: 0;
+  }
+}
+
+  </style>
 </head>
 <body>
-    <div class="app-container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <img src="https://via.placeholder.com/40" alt="Logo">
-                <h3>Campus Copilot</h3>
-            </div>
-            <div class="sidebar-menu">
-                <a href="/" class="menu-item">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="/exam-calendar" class="menu-item active">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span>Exam Calendar</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-users"></i>
-                    <span>Club Activities</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-utensils"></i>
-                    <span>Dining Options</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>Campus Map</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-book"></i>
-                    <span>Library Resources</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-bullhorn"></i>
-                    <span>Announcements</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-graduation-cap"></i>
-                    <span>Academic Resources</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-bus"></i>
-                    <span>Transportation</span>
-                </a>
-                <a href="#" class="menu-item">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-            </div>
+  <div class="app-container">
+    <!-- Sidebar Menu -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <img src="/static/images/logo.png" alt="Logo" class="logo-img">
+          <h2 class="sidebar-title">Campus Copilot</h2>
         </div>
+        <button id="closeSidebar" class="sidebar-close">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <nav class="sidebar-menu">
+        <ul>
+          <li class="sidebar-item active">
+            <a href="#" class="sidebar-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+              </svg>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              <span>Exam Calendar</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <span>Club Activities</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+                <rect x="9" y="3" width="6" height="4" rx="2"></rect>
+                <line x1="9" y1="17" x2="15" y2="17"></line>
+                <line x1="9" y1="13" x2="15" y2="13"></line>
+              </svg>
+              <span>Dining Options</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                <circle cx="12" cy="10" r="3"></circle>
+              </svg>
+              <span>Campus Map</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+              </svg>
+              <span>Library Resources</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3z"></path>
+                <path d="M11 3v4"></path>
+                <path d="M6 18v1a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3v-1"></path>
+              </svg>
+              <span>Announcements</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+              </svg>
+              <span>Academic Resources</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="8" width="20" height="12" rx="2" ry="2"></rect>
+                <circle cx="12" cy="14" r="2"></circle>
+                <path d="M8 8V6a4 4 0 0 1 8 0v2"></path>
+              </svg>
+              <span>Transportation</span>
+            </a>
+          </li>
+          <li class="sidebar-item">
+            <a href="#" class="sidebar-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
 
-        <!-- Main Content -->
-        <div class="main-content" id="main-content">
-            <div class="navbar">
-                <button class="menu-toggle" id="menu-toggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search for exams, subjects, etc.">
-                </div>
-                <div class="user-profile">
-                    <i class="fas fa-bell"></i>
-                    <img src="https://via.placeholder.com/40" alt="User Profile">
-                </div>
+    <div class="main-wrapper">
+      <!-- Header Section -->
+      <header class="header">
+        <div class="container">
+          <div class="header-content">
+            <div class="menu-toggle-wrapper">
+              <button id="sidebarToggle" class="menu-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="3" y1="12" x2="21" y2="12"></line>
+                  <line x1="3" y1="6" x2="21" y2="6"></line>
+                  <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+              </button>
+              <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="calendar-icon">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <h1 class="app-title">
+                  <span class="text-blue">Deadline</span>
+                  <span class="text-purple">Daze</span>
+                  <span class="text-dark-blue">Defender</span>
+                </h1>
+              </div>
             </div>
-
-            <h1 class="section-title"><i class="fas fa-calendar-alt"></i> Exam Calendar</h1>
             
-            <div class="calendar-container">
-                <div class="calendar-section">
-                    <div class="calendar-header">
-                        <div class="calendar-nav">
-                            <button id="prev-month"><i class="fas fa-chevron-left"></i></button>
-                            <div class="current-month" id="current-month">December 2023</div>
-                            <button id="next-month"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                        <div class="view-options">
-                            <button class="active">Month</button>
-                            <button>Week</button>
-                            <button>List</button>
-                        </div>
-                    </div>
-                    
-                    <div class="weekdays">
-                        <div>Sun</div>
-                        <div>Mon</div>
-                        <div>Tue</div>
-                        <div>Wed</div>
-                        <div>Thu</div>
-                        <div>Fri</div>
-                        <div>Sat</div>
-                    </div>
-                    
-                    <div class="days" id="calendar-days">
-                        <!-- Calendar days will be generated by JavaScript -->
-                    </div>
-                    
-                    <div class="event-list">
-                        <h3>Upcoming Exams</h3>
-                        <div class="event-item">
-                            <div class="event-details">
-                                <h4>Data Structures Midterm</h4>
-                                <p>Dec 15, 2023 • 10:00 AM • Room 301</p>
-                            </div>
-                            <div class="event-actions">
-                                <button><i class="fas fa-edit"></i></button>
-                                <button class="delete-btn"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                        <div class="event-item">
-                            <div class="event-details">
-                                <h4>Calculus II Final</h4>
-                                <p>Dec 20, 2023 • 2:00 PM • Hall B</p>
-                            </div>
-                            <div class="event-actions">
-                                <button><i class="fas fa-edit"></i></button>
-                                <button class="delete-btn"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-section">
-                    <h3 class="section-title"><i class="fas fa-plus-circle"></i> Add New Exam</h3>
-                    <form id="exam-form">
-                        <div class="form-group">
-                            <label for="subject">Subject Name</label>
-                            <input type="text" id="subject" name="subject" placeholder="e.g., Data Structures" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="exam-date">Exam Date</label>
-                            <input type="date" id="exam-date" name="exam-date" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="exam-time">Exam Time (optional)</label>
-                            <input type="time" id="exam-time" name="exam-time">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="exam-type">Exam Type</label>
-                            <select id="exam-type" name="exam-type" required>
-                                <option value="">Select Type</option>
-                                <option value="midterm">Midterm</option>
-                                <option value="final">Final</option>
-                                <option value="quiz">Quiz</option>
-                                <option value="assignment">Assignment</option>
-                                <option value="project">Project</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="location">Location (optional)</label>
-                            <input type="text" id="location" name="location" placeholder="e.g., Room 301">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="notes">Notes (optional)</label>
-                            <input type="text" id="notes" name="notes" placeholder="Any additional information">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Reminder Settings</label>
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="email-reminder" name="email-reminder">
-                                <label for="email-reminder">Email Reminder</label>
-                            </div>
-                            <div class="form-group" id="email-input-group" style="display: none;">
-                                <label for="email">Email Address</label>
-                                <input type="email" id="email" name="email" placeholder="Enter your email address">
-                            </div>
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="notification-reminder" name="notification-reminder">
-                                <label for="notification-reminder">Browser Notification</label>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="submit-btn">Add Exam</button>
-                    </form>
-                </div>
+            <div class="notification-badge">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="bell-icon">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span class="notification-text">Exam Alert System</span>
             </div>
+          </div>
         </div>
-    </div>
-
-    <!-- Event Details Modal -->
-    <div class="modal" id="event-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Exam Details</h3>
-                <button class="close-modal">&times;</button>
+      </header>
+      
+      <main class="main-content">
+        <div class="container">
+          <div class="content-grid">
+            <!-- Exam Form Section -->
+            <div class="exam-form-container">
+              <div class="card">
+                <h2 class="card-title">Add New Exam</h2>
+                <form id="examForm" class="exam-form">
+                  <div class="form-group">
+                    <label for="examName">Exam Name</label>
+                    <input type="text" id="examName" name="examName" placeholder="e.g., Calculus Final" required>
+                  </div>
+                  
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="examDate">Exam Date</label>
+                      <input type="date" id="examDate" name="examDate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                      <label for="examTime">Exam Time</label>
+                      <input type="time" id="examTime" name="examTime" required>
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="examRoom">Room Number/Location</label>
+                    <input type="text" id="examRoom" name="examRoom" placeholder="e.g., Room 302, Building A" required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="notificationType">Notification Preference</label>
+                    <select id="notificationType" name="notificationType" required>
+                      <option value="">Select notification type</option>
+                      <option value="browser">Browser Notification</option>
+                      <option value="email">Email Notification</option>
+                    </select>
+                  </div>
+                  
+                  <div id="emailFieldContainer" class="form-group hidden">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="your.email@university.edu">
+                  </div>
+                  
+                  <button type="submit" class="btn btn-primary">Add Exam</button>
+                </form>
+              </div>
             </div>
-            <div class="modal-body">
-                <div class="event-details-content">
-                    <p><strong>Subject:</strong> <span id="modal-subject"></span></p>
-                    <p><strong>Date:</strong> <span id="modal-date"></span></p>
-                    <p><strong>Time:</strong> <span id="modal-time"></span></p>
-                    <p><strong>Type:</strong> <span id="modal-type"></span></p>
-                    <p><strong>Location:</strong> <span id="modal-location"></span></p>
-                    <p><strong>Notes:</strong> <span id="modal-notes"></span></p>
+            
+            <!-- Exam List Section -->
+            <div class="exam-list-container">
+              <h2 class="section-title">Your Exams</h2>
+              
+              <div class="tabs">
+                <div class="tab-list">
+                  <button class="tab-button active" data-tab="upcoming">
+                    Upcoming (<span id="pendingCount">0</span>)
+                  </button>
+                  <button class="tab-button" data-tab="completed">
+                    Completed (<span id="completedCount">0</span>)
+                  </button>
                 </div>
+                
+                <div class="tab-content active" id="upcoming-tab">
+                  <div id="pending-exams" class="exam-cards">
+                    <!-- Pending exams will be displayed here -->
+                    <div class="empty-state">
+                      <p>No upcoming exams. Add your first exam!</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="tab-content" id="completed-tab">
+                  <div id="completed-exams" class="exam-cards">
+                    <!-- Completed exams will be displayed here -->
+                    <div class="empty-state">
+                      <p>No completed exams yet.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
+      </main>
+      
+      <footer class="footer">
+        <div class="container">
+          <p>Deadline Daze Defender - Your Exam Management Assistant</p>
+        </div>
+      </footer>
     </div>
+  </div>
 
-    <!-- Chatbot Button -->
-    <div class="chatbot-button" id="chatbot-button">
-        <i class="fas fa-comment"></i>
-    </div>
+  <!-- Toast notification container -->
+  <div id="toast-container" class="toast-container"></div>
 
-    <script>
-        // Toggle sidebar
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const mainContent = document.getElementById('main-content');
+  <script>
+
+// DOM Elements
+const examForm = document.getElementById('examForm');
+const notificationTypeSelect = document.getElementById('notificationType');
+const emailFieldContainer = document.getElementById('emailFieldContainer');
+const pendingExamsContainer = document.getElementById('pending-exams');
+const completedExamsContainer = document.getElementById('completed-exams');
+const pendingCountElement = document.getElementById('pendingCount');
+const completedCountElement = document.getElementById('completedCount');
+const tabButtons = document.querySelectorAll('.tab-button');
+const tabContents = document.querySelectorAll('.tab-content');
+const toastContainer = document.getElementById('toast-container');
+const sidebarToggle = document.getElementById('sidebarToggle');
+const sidebar = document.querySelector('.sidebar');
+const mainWrapper = document.querySelector('.main-wrapper');
+const closeSidebar = document.getElementById('closeSidebar');
+const sidebarLinks = document.querySelectorAll('.sidebar-link');
+
+// Sidebar Toggle
+const toggleSidebar = () => {
+  sidebar.classList.toggle('open');
+  mainWrapper.classList.toggle('sidebar-open');
+};
+
+// Event Listeners for sidebar
+sidebarToggle.addEventListener('click', toggleSidebar);
+closeSidebar.addEventListener('click', toggleSidebar);
+
+// Highlight active sidebar item
+sidebarLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    // Remove active class from all items
+    document.querySelectorAll('.sidebar-item').forEach(item => {
+      item.classList.remove('active');
+    });
+    // Add active class to clicked item's parent
+    link.parentElement.classList.add('active');
+    
+    // Optional: Close sidebar on mobile after clicking a link
+    if (window.innerWidth <= 768) {
+      sidebar.classList.remove('open');
+      mainWrapper.classList.remove('sidebar-open');
+    }
+  });
+});
+
+// Close sidebar when clicking outside of it (optional for mobile)
+document.addEventListener('click', (e) => {
+  const clickedInside = sidebar.contains(e.target) || sidebarToggle.contains(e.target);
+  if (!clickedInside && window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+    sidebar.classList.remove('open');
+    mainWrapper.classList.remove('sidebar-open');
+  }
+});
+
+// Exam data storage
+let exams = JSON.parse(localStorage.getItem('exams')) || [];
+
+// Format dates and handle when they are strings from localStorage
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  const options = { month: 'short', day: 'numeric', year: 'numeric' };
+  return date.toLocaleDateString('en-US', options);
+};
+
+// Format time from 24-hour to 12-hour format
+const formatTime = (timeString) => {
+  if (!timeString) return 'Time not specified';
+  
+  const [hour, minute] = timeString.split(':').map(Number);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+  return `${hour12}:${minute.toString().padStart(2, '0')} ${period}`;
+};
+
+// Check if an exam is urgent (within 24 hours)
+const isExamUrgent = (examDate, examTime) => {
+  const now = new Date();
+  const examDateTime = new Date(examDate);
+  
+  // Parse time and set it on the exam date
+  if (examTime) {
+    const [hours, minutes] = examTime.split(':').map(Number);
+    examDateTime.setHours(hours, minutes);
+  }
+  
+  const timeDiff = examDateTime.getTime() - now.getTime();
+  const hoursDiff = timeDiff / (1000 * 60 * 60);
+  
+  return hoursDiff > 0 && hoursDiff <= 24;
+};
+
+// Create a toast notification
+const createToast = (title, description, variant = 'default') => {
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${variant}`;
+  toast.innerHTML = `
+    <div class="toast-title">${title}</div>
+    <div class="toast-description">${description}</div>
+    <button class="toast-close" onclick="this.parentElement.remove()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  `;
+  
+  toastContainer.appendChild(toast);
+  
+  // Remove toast after 5 seconds
+  setTimeout(() => {
+    toast.remove();
+  }, 5000);
+  
+  return toast;
+};
+
+// Render exams in their respective containers
+const renderExams = () => {
+  const pendingExams = exams.filter(exam => !exam.completed)
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  const completedExams = exams.filter(exam => exam.completed)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+  
+  // Update counters
+  pendingCountElement.textContent = pendingExams.length;
+  completedCountElement.textContent = completedExams.length;
+  
+  // Clear containers
+  pendingExamsContainer.innerHTML = '';
+  completedExamsContainer.innerHTML = '';
+  
+  // Show empty state if needed
+  if (pendingExams.length === 0) {
+    pendingExamsContainer.innerHTML = '<div class="empty-state"><p>No upcoming exams. Add your first exam!</p></div>';
+  }
+  
+  if (completedExams.length === 0) {
+    completedExamsContainer.innerHTML = '<div class="empty-state"><p>No completed exams yet.</p></div>';
+  }
+  
+  // Render pending exams
+  pendingExams.forEach(exam => {
+    const urgent = isExamUrgent(exam.date, exam.time);
+    const examCard = document.createElement('div');
+    examCard.className = `exam-card ${urgent ? 'exam-card-urgent' : ''}`;
+    
+    // Add shimmer effect for urgent exams
+    if (urgent) {
+      const shimmer = document.createElement('div');
+      shimmer.className = 'card-shimmer';
+      examCard.appendChild(shimmer);
+    }
+    
+    examCard.innerHTML = `
+      <div class="exam-card-header">
+        <h3 class="exam-name">${exam.name}</h3>
+        ${urgent ? '<span class="urgent-badge">Urgent</span>' : ''}
+      </div>
+      
+      <div class="exam-details">
+        <div class="exam-detail">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>${formatDate(exam.date)}</span>
+        </div>
         
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-            mainContent.classList.toggle('active');
-        });
+        <div class="exam-detail">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>${formatTime(exam.time)}</span>
+        </div>
+      </div>
+      
+      <div class="exam-detail">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        <span>${exam.room}</span>
+      </div>
+      
+      <div class="exam-notification">
+        ${exam.notificationType === 'email' ? 
+          `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+          <span>Email notification to ${exam.email}</span>` : 
+          `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span>Browser notification</span>`
+        }
+      </div>
+      
+      <div class="exam-actions">
+        <button class="btn btn-outline" data-action="complete" data-id="${exam.id}">Mark Complete</button>
+        <button class="btn btn-destructive" data-action="remove" data-id="${exam.id}">Remove</button>
+      </div>
+    `;
+    
+    pendingExamsContainer.appendChild(examCard);
+  });
+  
+  // Render completed exams
+  completedExams.forEach(exam => {
+    const examCard = document.createElement('div');
+    examCard.className = 'exam-card exam-card-completed';
+    
+    examCard.innerHTML = `
+      <div class="exam-card-header">
+        <h3 class="exam-name completed">${exam.name}</h3>
+      </div>
+      
+      <div class="exam-details">
+        <div class="exam-detail">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>${formatDate(exam.date)}</span>
+        </div>
         
-        // Calendar functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const calendarDays = document.getElementById('calendar-days');
-            const currentMonthElement = document.getElementById('current-month');
-            const prevMonthBtn = document.getElementById('prev-month');
-            const nextMonthBtn = document.getElementById('next-month');
-            
-            let currentDate = new Date();
-            let currentMonth = currentDate.getMonth();
-            let currentYear = currentDate.getFullYear();
-            
-            // Sample exam data (in a real app, this would come from a database)
-            const exams = [
-                { id: 1, subject: 'Data Structures', date: '2023-12-15', time: '10:00', type: 'Midterm', location: 'Room 301', notes: 'Chapters 1-5' },
-                { id: 2, subject: 'Calculus II', date: '2023-12-20', time: '14:00', type: 'Final', location: 'Hall B', notes: 'Comprehensive' }
-            ];
-            
-            function generateCalendar() {
-                const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-                const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
-                const lastDayPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
-                
-                currentMonthElement.textContent = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
-                
-                calendarDays.innerHTML = '';
-                
-                // Previous month's days
-                for (let i = firstDay - 1; i >= 0; i--) {
-                    const dayElement = document.createElement('div');
-                    dayElement.classList.add('empty');
-                    dayElement.textContent = lastDayPrevMonth - i;
-                    calendarDays.appendChild(dayElement);
-                }
-                
-                // Current month's days
-                for (let i = 1; i <= lastDate; i++) {
-                    const dayElement = document.createElement('div');
-                    
-                    // Check if there's an exam on this day
-                    const currentDateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                    const hasExam = exams.some(exam => exam.date === currentDateStr);
-                    
-                    if (hasExam) {
-                        dayElement.classList.add('has-event');
-                        dayElement.addEventListener('click', () => showExamDetails(currentDateStr));
-                    }
-                    
-                    // Check if it's today
-                    if (i === currentDate.getDate() && currentMonth === currentDate.getMonth() && currentYear === currentDate.getFullYear()) {
-                        dayElement.classList.add('today');
-                    }
-                    
-                    dayElement.textContent = i;
-                    calendarDays.appendChild(dayElement);
-                }
-                
-                // Next month's days
-                const totalDaysDisplayed = firstDay + lastDate;
-                const remainingCells = 7 - (totalDaysDisplayed % 7);
-                
-                if (remainingCells < 7) {
-                    for (let i = 1; i <= remainingCells; i++) {
-                        const dayElement = document.createElement('div');
-                        dayElement.classList.add('empty');
-                        dayElement.textContent = i;
-                        calendarDays.appendChild(dayElement);
-                    }
-                }
-            }
-            
-            function showExamDetails(dateStr) {
-                const modal = document.getElementById('event-modal');
-                const modalSubject = document.getElementById('modal-subject');
-                const modalDate = document.getElementById('modal-date');
-                const modalTime = document.getElementById('modal-time');
-                const modalType = document.getElementById('modal-type');
-                const modalLocation = document.getElementById('modal-location');
-                const modalNotes = document.getElementById('modal-notes');
-                
-                // Find exams for the selected date
-                const examsOnDate = exams.filter(exam => exam.date === dateStr);
-                
-                if (examsOnDate.length > 0) {
-                    const exam = examsOnDate[0]; // Show the first exam (in a real app, you might list all)
-                    
-                    modalSubject.textContent = exam.subject;
-                    modalDate.textContent = new Date(exam.date).toLocaleDateString();
-                    modalTime.textContent = exam.time;
-                    modalType.textContent = exam.type;
-                    modalLocation.textContent = exam.location;
-                    modalNotes.textContent = exam.notes;
-                    
-                    modal.classList.add('active');
-                }
-            }
-            
-            // Event listeners for month navigation
-            prevMonthBtn.addEventListener('click', () => {
-                currentMonth--;
-                if (currentMonth < 0) {
-                    currentMonth = 11;
-                    currentYear--;
-                }
-                generateCalendar();
-            });
-            
-            nextMonthBtn.addEventListener('click', () => {
-                currentMonth++;
-                if (currentMonth > 11) {
-                    currentMonth = 0;
-                    currentYear++;
-                }
-                generateCalendar();
-            });
-            
-            // Close modal
-            document.querySelector('.close-modal').addEventListener('click', () => {
-                document.getElementById('event-modal').classList.remove('active');
-            });
-            
-            // Form submission
-            document.getElementById('exam-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // In a real app, this would send data to the server
-                alert('Exam added successfully!');
-                this.reset();
-            });
-            
-            // Initialize calendar
-            generateCalendar();
-        });
-        
-        // Chatbot functionality (placeholder)
-        const chatbotButton = document.getElementById('chatbot-button');
-        
-        chatbotButton.addEventListener('click', () => {
-            alert('Chatbot functionality will be implemented here!');
-            // In a real implementation, this would open a chat interface
-        });
+        <div class="exam-detail">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+          <span>${formatTime(exam.time)}</span>
+        </div>
+      </div>
+      
+      <div class="exam-detail">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        <span>${exam.room}</span>
+      </div>
+      
+      <div class="exam-actions">
+        <button class="btn btn-destructive" data-action="remove" data-id="${exam.id}">Remove</button>
+      </div>
+    `;
+    
+    completedExamsContainer.appendChild(examCard);
+  });
+  
+  // Add event listeners to buttons
+  document.querySelectorAll('[data-action]').forEach(button => {
+    button.addEventListener('click', handleExamAction);
+  });
+};
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const emailReminderCheckbox = document.getElementById('email-reminder');
-            const emailInputGroup = document.getElementById('email-input-group');
-            const notificationReminderCheckbox = document.getElementById('notification-reminder');
+// Handle exam actions (mark complete or remove)
+const handleExamAction = (event) => {
+  const action = event.target.dataset.action;
+  const examId = event.target.dataset.id;
+  
+  if (action === 'complete') {
+    markExamAsCompleted(examId);
+  } else if (action === 'remove') {
+    removeExam(examId);
+  }
+};
 
-            // Show/hide email input based on checkbox
-            emailReminderCheckbox.addEventListener('change', function() {
-                emailInputGroup.style.display = this.checked ? 'block' : 'none';
-            });
+// Mark an exam as completed
+const markExamAsCompleted = (id) => {
+  exams = exams.map(exam => 
+    exam.id === id ? { ...exam, completed: true } : exam
+  );
+  
+  // Save to localStorage and re-render
+  localStorage.setItem('exams', JSON.stringify(exams));
+  renderExams();
+  
+  createToast(
+    'Exam Completed', 
+    'Congratulations! The exam has been marked as completed.',
+    'default'
+  );
+};
 
-            // Request permission for notifications
-            if (Notification.permission !== 'denied') {
-                Notification.requestPermission();
-            }
+// Remove an exam
+const removeExam = (id) => {
+  exams = exams.filter(exam => exam.id !== id);
+  
+  // Save to localStorage and re-render
+  localStorage.setItem('exams', JSON.stringify(exams));
+  renderExams();
+  
+  createToast(
+    'Exam Removed', 
+    'The exam has been removed from your schedule.',
+    'destructive'
+  );
+};
 
-            // Function to send browser notification
-            function sendBrowserNotification(examDetails) {
-                if (Notification.permission === 'granted') {
-                    new Notification('Exam Reminder', {
-                        body: `You have an exam for ${examDetails.subject} on ${examDetails.date} at ${examDetails.time}.`,
-                        icon: 'https://via.placeholder.com/40' // Replace with your icon URL
-                    });
-                }
-            }
+// Add a new exam
+const addExam = (examData) => {
+  const newExam = {
+    ...examData,
+    id: Date.now().toString(),
+    createdAt: new Date().toISOString(),
+    completed: false,
+  };
+  
+  exams.push(newExam);
+  
+  // Save to localStorage and re-render
+  localStorage.setItem('exams', JSON.stringify(exams));
+  renderExams();
+  
+  createToast(
+    'Exam Added', 
+    `"${examData.name}" has been added to your schedule.`,
+    'default'
+  );
+};
 
-            // Form submission
-            document.getElementById('exam-form').addEventListener('submit', function(e) {
-                e.preventDefault();
+// Check for upcoming exams that need notifications
+const checkForUpcomingExams = () => {
+  const now = new Date();
+  
+  exams.forEach(exam => {
+    if (exam.completed) return;
+    
+    const examDate = new Date(exam.date);
+    if (exam.time) {
+      const [hours, minutes] = exam.time.split(':').map(Number);
+      examDate.setHours(hours, minutes);
+    }
+    
+    const timeDiff = examDate.getTime() - now.getTime();
+    const hoursDiff = timeDiff / (1000 * 60 * 60);
+    
+    if (hoursDiff > 0 && hoursDiff <= 24) {
+      // For browser notifications
+      if (exam.notificationType === 'browser') {
+        createToast(
+          `Upcoming Exam: ${exam.name}`,
+          `Your exam is in ${Math.round(hoursDiff)} hours - Room: ${exam.room}`,
+          'default'
+        );
+      }
+      
+      // For email notifications (simulated)
+      if (exam.notificationType === 'email' && exam.email) {
+        console.log(`Email notification would be sent to ${exam.email} for exam: ${exam.name}`);
+        // In a real Django app, this would call an API endpoint to send an email
+      }
+    }
+  });
+};
 
-                const examDetails = {
-                    subject: document.getElementById('subject').value,
-                    date: document.getElementById('exam-date').value,
-                    time: document.getElementById('exam-time').value,
-                };
+// Handle tab switching
+const switchTab = (tabId) => {
+  tabButtons.forEach(button => {
+    if (button.dataset.tab === tabId) {
+      button.classList.add('active');
+    } else {
+      button.classList.remove('active');
+    }
+  });
+  
+  tabContents.forEach(content => {
+    if (content.id === `${tabId}-tab`) {
+      content.classList.add('active');
+    } else {
+      content.classList.remove('active');
+    }
+  });
+};
 
-                // Handle email notification
-                if (emailReminderCheckbox.checked) {
-                    const email = document.getElementById('email').value;
-                    if (email) {
-                        // Here you would typically send the email to your server for processing
-                        alert(`Email reminder set for ${email} for the exam on ${examDetails.date} at ${examDetails.time}.`);
-                    } else {
-                        alert('Please enter a valid email address for email reminders.');
-                    }
-                }
+// Event listeners
+document.addEventListener('DOMContentLoaded', () => {
+  // Render exams on page load
+  renderExams();
+  
+  // Check for upcoming exams
+  checkForUpcomingExams();
+  setInterval(checkForUpcomingExams, 60000); // Check every minute
+  
+  // Show/hide email field based on notification type
+  notificationTypeSelect.addEventListener('change', () => {
+    if (notificationTypeSelect.value === 'email') {
+      emailFieldContainer.classList.remove('hidden');
+    } else {
+      emailFieldContainer.classList.add('hidden');
+    }
+  });
+  
+  // Handle form submission
+  examForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    
+    const formData = new FormData(examForm);
+    const examData = {
+      name: formData.get('examName'),
+      date: formData.get('examDate'),
+      time: formData.get('examTime'),
+      room: formData.get('examRoom'),
+      notificationType: formData.get('notificationType'),
+    };
+    
+    // Add email if notification type is email
+    if (examData.notificationType === 'email') {
+      const email = formData.get('email');
+      if (!email) {
+        createToast('Error', 'Email is required for email notifications', 'destructive');
+        return;
+      }
+      examData.email = email;
+    }
+    
+    addExam(examData);
+    examForm.reset();
+    emailFieldContainer.classList.add('hidden');
+  });
+  
+  // Handle tab switching
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      switchTab(button.dataset.tab);
+    });
+  });
+});
 
-                // Handle browser notification
-                if (notificationReminderCheckbox.checked) {
-                    sendBrowserNotification(examDetails);
-                }
-
-                // Reset the form
-                this.reset();
-            });
-        });
-    </script>
+  </script>
 </body>
 </html>
