@@ -1,0 +1,58 @@
+{% extends 'announcements/base.html' %}
+
+{% block title %}{{ is_creating|yesno:"Create,Edit" }} Announcement{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>{{ is_creating|yesno:"Create,Edit" }} Announcement</h1>
+    
+    <form method="post" class="announcement-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">Title</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <div class="error-message">{{ form.title.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.category.id_for_label }}">Category</label>
+            {{ form.category }}
+            {% if form.category.errors %}
+                <div class="error-message">{{ form.category.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.content.id_for_label }}">Content</label>
+            {{ form.content }}
+            {% if form.content.errors %}
+                <div class="error-message">{{ form.content.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.author.id_for_label }}">Author</label>
+            {{ form.author }}
+            {% if form.author.errors %}
+                <div class="error-message">{{ form.author.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group checkbox-group">
+            {{ form.important }}
+            <label for="{{ form.important.id_for_label }}">Mark as important</label>
+            {% if form.important.errors %}
+                <div class="error-message">{{ form.important.errors }}</div>
+            {% endif %}
+        </div>
+        
+        <div class="form-actions">
+            <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">{{ is_creating|yesno:"Create,Save" }}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

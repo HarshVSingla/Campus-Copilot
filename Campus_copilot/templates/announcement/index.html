@@ -1,0 +1,43 @@
+{% extends 'announcements/base.html' %}
+
+{% block title %}College Announcements{% endblock %}
+{% load static %}
+{% block content %}
+<div class="page-intro">
+    <h1>College Announcements</h1>
+    <p>Stay updated with the latest announcements, events, and important information from our college.</p>
+</div>
+
+<div class="announcements-list">
+    {% if announcements %}
+        {% for announcement in announcements %}
+        <a href="{% url 'view_announcement' announcement.id %}">
+            <div class="announcement-card {% if announcement.important %}important{% endif %}">
+              {{ announcement.title }}
+            
+          </a>
+                <div class="announcement-header">
+                    <h2>{{ announcement.title }}</h2>
+                    <span class="badge badge-{{ announcement.category }}">
+                        {% if announcement.category == 'academic' %}📚{% endif %}
+                        {% if announcement.category == 'event' %}🎭{% endif %}
+                        {% if announcement.category == 'administrative' %}📋{% endif %}
+                        {% if announcement.category == 'career' %}💼{% endif %}
+                        {% if announcement.category == 'general' %}📢{% endif %}
+                        {{ announcement.get_category_display }}
+                    </span>
+                </div>
+                <div class="announcement-content">
+                    <p>{{ announcement.content|truncatechars:150 }}</p>
+                </div>
+                <div class="announcement-footer">
+                    <span>By: {{ announcement.author }}</span>
+                    <span>{{ announcement.date|timesince }} ago</span>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-results">No announcements found.</p>
+    {% endif %}
+</div>
+{% endblock %}

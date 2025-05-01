@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}College Announcements{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-bell"></i>
+                    <h1>College Announcements</h1>
+                </div>
+                <div class="search-bar">
+                    <form action="{% url 'index' %}" method="GET">
+                        <input type="search" name="search" placeholder="Search announcements..." value="{{ search_query|default:'' }}">
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+                <nav class="main-nav">
+                    <ul>
+                        <li><a href="{% url 'index' %}">Home</a></li>
+                        {% if user.is_authenticated %}
+                            <li><a href="{% url 'admin_dashboard' %}">Admin Dashboard</a></li>
+                            <li><a href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                            <li><a href="{% url 'login' %}">Admin Login</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

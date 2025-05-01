@@ -1,0 +1,28 @@
+{% extends 'announcements/base.html' %}
+
+{% block title %}{{ announcement.title }}{% endblock %}
+
+{% block content %}
+<a href="{% url 'index' %}" class="back-button"><i class="fas fa-arrow-left"></i> Back to Announcements</a>
+
+<div class="announcement-card {% if announcement.important %}important{% endif %} single-view">
+    <div class="announcement-header">
+        <h2>{{ announcement.title }}</h2>
+        <span class="badge badge-{{ announcement.category }}">
+            {% if announcement.category == 'academic' %}📚{% endif %}
+            {% if announcement.category == 'event' %}🎭{% endif %}
+            {% if announcement.category == 'administrative' %}📋{% endif %}
+            {% if announcement.category == 'career' %}💼{% endif %}
+            {% if announcement.category == 'general' %}📢{% endif %}
+            {{ announcement.get_category_display }}
+        </span>
+    </div>
+    <div class="announcement-content">
+        <p>{{ announcement.content }}</p>
+    </div>
+    <div class="announcement-footer">
+        <span>By: {{ announcement.author }}</span>
+        <span>{{ announcement.date|date:"F j, Y, g:i a" }}</span>
+    </div>
+</div>
+{% endblock %}

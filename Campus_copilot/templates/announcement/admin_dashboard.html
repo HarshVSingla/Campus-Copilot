@@ -1,0 +1,57 @@
+{% extends 'announcements/base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="admin-header">
+    <h1>Admin Dashboard</h1>
+    <a href="{% url 'create_announcement' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Create Announcement
+    </a>
+</div>
+
+<div class="announcements-table-wrapper">
+    <table class="announcements-table">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Author</th>
+                <th>Important</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for announcement in announcements %}
+                <tr>
+                    <td>{{ announcement.title }}</td>
+                    <td>
+                        <span class="badge badge-{{ announcement.category }}">
+                            {{ announcement.get_category_display }}
+                        </span>
+                    </td>
+                    <td>{{ announcement.date|date:"Y-m-d H:i" }}</td>
+                    <td>{{ announcement.author }}</td>
+                    <td>{% if announcement.important %}<i class="fas fa-check text-success"></i>{% else %}<i class="fas fa-times text-muted"></i>{% endif %}</td>
+                    <td class="actions">
+                        <a href="{% url 'view_announcement' announcement.id %}" class="btn btn-sm btn-info" title="View">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'edit_announcement' announcement.id %}" class="btn btn-sm btn-primary" title="Edit">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="{% url 'delete_announcement' announcement.id %}" class="btn btn-sm btn-danger" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No announcements found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
