@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Calendar - Campus Copilot</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4285F4;
+            --secondary-color: #34A853;
+            --accent-color: #FBBC05;
+            --danger-color: #EA4335;
+            --dark-color: #202124;
+            --light-color: #F8F9FA;
+            --sidebar-width: 280px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            left: -280px;
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar.active {
+            left: 0;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        
+        .sidebar-header h3 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        .sidebar-menu {
+            padding: 10px 0;
+        }
+        
+        .menu-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            color: var(--dark-color);
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+        
+        .menu-item:hover {
+            background-color: rgba(66, 133, 244, 0.1);
+        }
+        
+        .menu-item.active {
+            background-color: rgba(66, 133, 244, 0.2);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .menu-item i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+            color: var(--primary-color);
+        }
+        
+        .menu-item span {
+            font-size: 1rem;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: 0;
+            transition: margin-left 0.3s ease;
+            padding: 20px;
+        }
+        
+        .main-content.active {
+            margin-left: var(--sidebar-width);
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            margin-bottom: 30px;
+        }
+        
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-color);
+        }
+        
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 20px;
+            position: relative;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 50px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            outline: none;
+            font-size: 1rem;
+            padding-left: 40px;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 15px;
+        }
+        
+        /* Calendar Styles */
+        .calendar-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .calendar-section {
+            flex: 2;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+        }
+        
+        .form-section {
+            flex: 1;
+            min-width: 300px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+        }
+        
+        /* Calendar Grid */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            align-items: center;
+        }
+        
+        .calendar-nav button {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--primary-color);
+            padding: 5px 10px;
+        }
+        
+        .current-month {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin: 0 15px;
+        }
+        
+        .weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+        
+        .weekdays div {
+            padding: 10px;
+        }
+        
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-gap: 5px;
+        }
+        
+        .days div {
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .days div:hover:not(.empty) {
+            background-color: rgba(66, 133, 244, 0.1);
+        }
+        
+        .days .today {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .days .has-event {
+            position: relative;
+        }
+        
+        .days .has-event::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+        }
+        
+        .days .empty {
+            color: #ccc;
+            cursor: default;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            outline: none;
+            font-size: 1rem;
+        }
+        
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 1em;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .submit-btn:hover {
+            background-color: #3367d6;
+        }
+        
+        /* Event List */
+        .event-list {
+            margin-top: 30px;
+        }
+        
+        .event-item {
+            background-color: rgba(66, 133, 244, 0.1);
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .event-details h4 {
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .event-details p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .event-actions button {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+        
+        .event-actions button:hover {
+            color: var(--primary-color);
+        }
+        
+        .event-actions .delete-btn:hover {
+            color: var(--danger-color);
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .calendar-container {
+                flex-direction: column;
+            }
+            
+            .calendar-section, .form-section {
+                width: 100%;
+            }
+        }
+        
+        /* Chatbot Button */
+        .chatbot-button {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .chatbot-button:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="https://via.placeholder.com/40" alt="Logo">
+                <h3>Campus Copilot</h3>
+            </div>
+            <div class="sidebar-menu">
+                <a href="/" class="menu-item">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/exam-calendar" class="menu-item active">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Exam Calendar</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-users"></i>
+                    <span>Club Activities</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-utensils"></i>
+                    <span>Dining Options</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Campus Map</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-book"></i>
+                    <span>Library Resources</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcements</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>Academic Resources</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-bus"></i>
+                    <span>Transportation</span>
+                </a>
+                <a href="#" class="menu-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="main-content">
+            <div class="navbar">
+                <button class="menu-toggle" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search for exams, subjects, etc.">
+                </div>
+                <div class="user-profile">
+                    <i class="fas fa-bell"></i>
+                    <img src="https://via.placeholder.com/40" alt="User Profile">
+                </div>
+            </div>
+
+            <h1 class="section-title"><i class="fas fa-calendar-alt"></i> Exam Calendar</h1>
+            
+            <div class="calendar-container">
+                <div class="calendar-section">
+                    <div class="calendar-header">
+                        <div class="calendar-nav">
+                            <button id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                            <div class="current-month" id="current-month">December 2023</div>
+                            <button id="next-month"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <div class="view-options">
+                            <button class="active">Month</button>
+                            <button>Week</button>
+                            <button>List</button>
+                        </div>
+                    </div>
+                    
+                    <div class="weekdays">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+                    
+                    <div class="days" id="calendar-days">
+                        <!-- Calendar days will be generated by JavaScript -->
+                    </div>
+                    
+                    <div class="event-list">
+                        <h3>Upcoming Exams</h3>
+                        <div class="event-item">
+                            <div class="event-details">
+                                <h4>Data Structures Midterm</h4>
+                                <p>Dec 15, 2023 • 10:00 AM • Room 301</p>
+                            </div>
+                            <div class="event-actions">
+                                <button><i class="fas fa-edit"></i></button>
+                                <button class="delete-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <div class="event-item">
+                            <div class="event-details">
+                                <h4>Calculus II Final</h4>
+                                <p>Dec 20, 2023 • 2:00 PM • Hall B</p>
+                            </div>
+                            <div class="event-actions">
+                                <button><i class="fas fa-edit"></i></button>
+                                <button class="delete-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h3 class="section-title"><i class="fas fa-plus-circle"></i> Add New Exam</h3>
+                    <form id="exam-form">
+                        <div class="form-group">
+                            <label for="subject">Subject Name</label>
+                            <input type="text" id="subject" name="subject" placeholder="e.g., Data Structures" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="exam-date">Exam Date</label>
+                            <input type="date" id="exam-date" name="exam-date" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="exam-time">Exam Time (optional)</label>
+                            <input type="time" id="exam-time" name="exam-time">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="exam-type">Exam Type</label>
+                            <select id="exam-type" name="exam-type" required>
+                                <option value="">Select Type</option>
+                                <option value="midterm">Midterm</option>
+                                <option value="final">Final</option>
+                                <option value="quiz">Quiz</option>
+                                <option value="assignment">Assignment</option>
+                                <option value="project">Project</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="location">Location (optional)</label>
+                            <input type="text" id="location" name="location" placeholder="e.g., Room 301">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes">Notes (optional)</label>
+                            <input type="text" id="notes" name="notes" placeholder="Any additional information">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Reminder Settings</label>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="email-reminder" name="email-reminder">
+                                <label for="email-reminder">Email Reminder</label>
+                            </div>
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="notification-reminder" name="notification-reminder">
+                                <label for="notification-reminder">Browser Notification</label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">Add Exam</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div class="modal" id="event-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Exam Details</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="event-details-content">
+                    <p><strong>Subject:</strong> <span id="modal-subject"></span></p>
+                    <p><strong>Date:</strong> <span id="modal-date"></span></p>
+                    <p><strong>Time:</strong> <span id="modal-time"></span></p>
+                    <p><strong>Type:</strong> <span id="modal-type"></span></p>
+                    <p><strong>Location:</strong> <span id="modal-location"></span></p>
+                    <p><strong>Notes:</strong> <span id="modal-notes"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot Button -->
+    <div class="chatbot-button" id="chatbot-button">
+        <i class="fas fa-comment"></i>
+    </div>
+
+    <script>
+        // Toggle sidebar
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            mainContent.classList.toggle('active');
+        });
+        
+        // Calendar functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarDays = document.getElementById('calendar-days');
+            const currentMonthElement = document.getElementById('current-month');
+            const prevMonthBtn = document.getElementById('prev-month');
+            const nextMonthBtn = document.getElementById('next-month');
+            
+            let currentDate = new Date();
+            let currentMonth = currentDate.getMonth();
+            let currentYear = currentDate.getFullYear();
+            
+            // Sample exam data (in a real app, this would come from a database)
+            const exams = [
+                { id: 1, subject: 'Data Structures', date: '2023-12-15', time: '10:00', type: 'Midterm', location: 'Room 301', notes: 'Chapters 1-5' },
+                { id: 2, subject: 'Calculus II', date: '2023-12-20', time: '14:00', type: 'Final', location: 'Hall B', notes: 'Comprehensive' }
+            ];
+            
+            function generateCalendar() {
+                const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+                const lastDate = new Date(currentYear, currentMonth + 1, 0).getDate();
+                const lastDayPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+                
+                currentMonthElement.textContent = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' });
+                
+                calendarDays.innerHTML = '';
+                
+                // Previous month's days
+                for (let i = firstDay - 1; i >= 0; i--) {
+                    const dayElement = document.createElement('div');
+                    dayElement.classList.add('empty');
+                    dayElement.textContent = lastDayPrevMonth - i;
+                    calendarDays.appendChild(dayElement);
+                }
+                
+                // Current month's days
+                for (let i = 1; i <= lastDate; i++) {
+                    const dayElement = document.createElement('div');
+                    
+                    // Check if there's an exam on this day
+                    const currentDateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                    const hasExam = exams.some(exam => exam.date === currentDateStr);
+                    
+                    if (hasExam) {
+                        dayElement.classList.add('has-event');
+                        dayElement.addEventListener('click', () => showExamDetails(currentDateStr));
+                    }
+                    
+                    // Check if it's today
+                    if (i === currentDate.getDate() && currentMonth === currentDate.getMonth() && currentYear === currentDate.getFullYear()) {
+                        dayElement.classList.add('today');
+                    }
+                    
+                    dayElement.textContent = i;
+                    calendarDays.appendChild(dayElement);
+                }
+                
+                // Next month's days
+                const totalDaysDisplayed = firstDay + lastDate;
+                const remainingCells = 7 - (totalDaysDisplayed % 7);
+                
+                if (remainingCells < 7) {
+                    for (let i = 1; i <= remainingCells; i++) {
+                        const dayElement = document.createElement('div');
+                        dayElement.classList.add('empty');
+                        dayElement.textContent = i;
+                        calendarDays.appendChild(dayElement);
+                    }
+                }
+            }
+            
+            function showExamDetails(dateStr) {
+                const modal = document.getElementById('event-modal');
+                const modalSubject = document.getElementById('modal-subject');
+                const modalDate = document.getElementById('modal-date');
+                const modalTime = document.getElementById('modal-time');
+                const modalType = document.getElementById('modal-type');
+                const modalLocation = document.getElementById('modal-location');
+                const modalNotes = document.getElementById('modal-notes');
+                
+                // Find exams for the selected date
+                const examsOnDate = exams.filter(exam => exam.date === dateStr);
+                
+                if (examsOnDate.length > 0) {
+                    const exam = examsOnDate[0]; // Show the first exam (in a real app, you might list all)
+                    
+                    modalSubject.textContent = exam.subject;
+                    modalDate.textContent = new Date(exam.date).toLocaleDateString();
+                    modalTime.textContent = exam.time;
+                    modalType.textContent = exam.type;
+                    modalLocation.textContent = exam.location;
+                    modalNotes.textContent = exam.notes;
+                    
+                    modal.classList.add('active');
+                }
+            }
+            
+            // Event listeners for month navigation
+            prevMonthBtn.addEventListener('click', () => {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                generateCalendar();
+            });
+            
+            nextMonthBtn.addEventListener('click', () => {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                generateCalendar();
+            });
+            
+            // Close modal
+            document.querySelector('.close-modal').addEventListener('click', () => {
+                document.getElementById('event-modal').classList.remove('active');
+            });
+            
+            // Form submission
+            document.getElementById('exam-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // In a real app, this would send data to the server
+                alert('Exam added successfully!');
+                this.reset();
+            });
+            
+            // Initialize calendar
+            generateCalendar();
+        });
+        
+        // Chatbot functionality (placeholder)
+        const chatbotButton = document.getElementById('chatbot-button');
+        
+        chatbotButton.addEventListener('click', () => {
+            alert('Chatbot functionality will be implemented here!');
+            // In a real implementation, this would open a chat interface
+        });
+    </script>
+</body>
+</html>
