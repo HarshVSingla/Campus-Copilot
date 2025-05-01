@@ -294,7 +294,7 @@
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
-                <a href="#" class="menu-item">
+                <a href="{% url 'exam_calender:exam_calendar' %}" class="menu-item">
                     <i class="fas fa-calendar-alt"></i>
                     <span>Exam Calendar</span>
                 </a>
@@ -356,6 +356,7 @@
             </div>
 
             <div class="features-section">
+                <a href="{% url 'exam_calender:exam_calendar' %}">
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-calendar-alt"></i>
@@ -363,6 +364,8 @@
                     <h3>Exam Calendar</h3>
                     <p>Never miss an important deadline again. Keep track of all your exams, assignments, and project due dates in one place.</p>
                 </div>
+                </a>
+                
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-users"></i>
