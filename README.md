@@ -38,21 +38,19 @@ An ultimate AI companion for college life. Whether you're navigating campus FAQs
 
 
 ---
-
-Hackindia-Spark7-2025-Brew3/
-├── frontend/
-│   ├── index.html
-│   ├── styles/
-│   └── scripts/
-├── backend/
-│   ├── manage.py
-│   ├── app/
-│   └── db.sqlite3
-├── README.md
-└── requirements.txt
-
-
-
+CAMPUS-COPILOT/
+├── Campus_copilot/          # Main Django project configuration
+│
+├── announcement/            # App for managing announcements and updates
+├── club_activites/          # App for clubs, events, and activities
+├── exam_calender/           # App for managing exam schedules
+├── home/                    # Landing page and general views
+├── lib_resource/            # App for library and learning resources
+├── templates/               # Shared HTML templates for rendering pages
+│
+├── db.sqlite3               # SQLite3 database file
+├── manage.py                # Django management script
+└── README.md                # Project README file
  🛠️ Tech Stack
 
 
