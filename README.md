@@ -39,6 +39,18 @@ An ultimate AI companion for college life. Whether you're navigating campus FAQs
 
 ---
 
+Hackindia-Spark7-2025-Brew3/
+├── frontend/
+│   ├── index.html
+│   ├── styles/
+│   └── scripts/
+├── backend/
+│   ├── manage.py
+│   ├── app/
+│   └── db.sqlite3
+├── README.md
+└── requirements.txt
+
 
 
  🛠️ Tech Stack
