@@ -38,7 +38,7 @@ An ultimate AI companion for college life. Whether you're navigating campus FAQs
 
 
 ---
-PROJECT STRUCTURE:-
+PROJECT STRUCTURE:- <br><br>
 ├── Campus_copilot/          # Main Django project configuration <br>
 │
 ├── announcement/            # App for managing announcements and updates <br>
@@ -51,6 +51,9 @@ PROJECT STRUCTURE:-
 ├── db.sqlite3               # SQLite3 database file <br>
 ├── manage.py                # Django management script <br>
 └── README.md                # Project README file <br>
+
+
+
  🛠️ Tech Stack
 
 
