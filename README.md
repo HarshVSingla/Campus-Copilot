@@ -6,7 +6,7 @@ An ultimate AI companion for college life. Whether you're navigating campus FAQs
 
 
 
-📅 Smart Schedule Assistant 
+📅 *Smart Schedule Assistant* 
 
   Get personalized reminders for classes, assignments, and events.
 
@@ -40,7 +40,7 @@ An ultimate AI companion for college life. Whether you're navigating campus FAQs
 
 
 
-## 🛠️ Tech Stack
+ 🛠️ Tech Stack
 
 
 
