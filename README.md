@@ -38,19 +38,19 @@ An ultimate AI companion for college life. Whether you're navigating campus FAQs
 
 
 ---
-CAMPUS-COPILOT/
-├── Campus_copilot/          # Main Django project configuration
+PROJECT STRUCTURE:-
+├── Campus_copilot/          # Main Django project configuration <br>
 │
-├── announcement/            # App for managing announcements and updates
-├── club_activites/          # App for clubs, events, and activities
-├── exam_calender/           # App for managing exam schedules
-├── home/                    # Landing page and general views
-├── lib_resource/            # App for library and learning resources
-├── templates/               # Shared HTML templates for rendering pages
+├── announcement/            # App for managing announcements and updates <br>
+├── club_activites/          # App for clubs, events, and activities <br>
+├── exam_calender/           # App for managing exam schedules <br>
+├── home/                    # Landing page and general views <br>
+├── lib_resource/            # App for library and learning resources <br>
+├── templates/               # Shared HTML templates for rendering pages <br>
 │
-├── db.sqlite3               # SQLite3 database file
-├── manage.py                # Django management script
-└── README.md                # Project README file
+├── db.sqlite3               # SQLite3 database file <br>
+├── manage.py                # Django management script <br>
+└── README.md                # Project README file <br>
  🛠️ Tech Stack
 
 
